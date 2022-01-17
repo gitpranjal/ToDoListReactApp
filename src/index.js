@@ -4,6 +4,7 @@ import TaskDetail from './TaskDetail'
 import Modal from 'react-modal'
 import moment  from 'moment'
 import axios from 'axios'
+import { assertLiteral } from '@babel/types'
 
 const App = () => {
 
@@ -111,6 +112,7 @@ const App = () => {
                     .then((response) => response.json())
                     .then((responseJson) => {
                       console.log("Backend updated")
+                      alert("Backend data updated!!")
                     })
                     .catch((error) => console.log(error));
             }}
