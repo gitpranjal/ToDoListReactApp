@@ -1,16 +1,14 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactDom from 'react-dom'
 import TaskDetail from './TaskDetail'
 import Modal from 'react-modal'
 import moment  from 'moment'
+import axios from 'axios'
 
 const App = () => {
 
 
-    const [taskList, setTaskList] = useState([{
-        "taskName": "Task A", "taskDeadline": "Date A", "author": "Sam", "status": "Pending", "dateAdded": moment().format("MMM Do YY")
-    },
-    ])
+    const [taskList, setTaskList] = useState([])
 
     const [ isModalOpen, setModalOpen ] = useState(false)
     const [newTaskInfoObject, setNewTaskInfoObject] = useState({
@@ -21,6 +19,21 @@ const App = () => {
         "dateAdded": "",
     })
     
+    useEffect(() => {
+
+        
+        axios.get(
+            "https://hidden-peak-98296.herokuapp.com/",
+            //"http://localhost:3001/"
+            )
+        .then((response) => {
+            console.log(response.data)
+            setTaskList(response.data)
+        })
+            
+        .catch((error) => console.log(error)); //to catch the errors if any
+        
+    }, [])
     
    
 //     const tasks = [{
@@ -68,13 +81,44 @@ const App = () => {
                 deleteTaskCallback={deleteTaskCallback}
             />
     })
+    console.log("######", taskList)
     return (
+        
         // <div className="ui container commments">
         //     <TaskDetail taskName="TaskA" taskDeadline="Date A" author="Sam"/>
         //     <TaskDetail taskName="TaskB" taskDeadline="Date B" author="Kim"/>
         //     <TaskDetail taskName="TaskC" taskDeadline="Date C" author="Rim"/>
         // </div>
         <div style={{marginLeft: 20, marginTop: 10}}>
+
+            <button 
+            className="ui basic blue button"
+            onClick={() => {
+                fetch(
+                    "https://hidden-peak-98296.herokuapp.com/updateTasks",
+                    //"http://localhost:3001/updateTasks",
+                    {
+                      method: "POST",
+                      body: JSON.stringify({
+                        newTasksList: taskList,
+                      }),
+                      headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                      },
+                    }
+                  )
+                    .then((response) => response.json())
+                    .then((responseJson) => {
+                      console.log("Backend updated")
+                    })
+                    .catch((error) => console.log(error));
+            }}
+            >
+                <div>Update Backend</div>
+            
+            </button>
+
             <button 
             className="ui basic blue button"
             onClick={() => setModalOpen(true)}
@@ -82,6 +126,7 @@ const App = () => {
                 <div>+ Add Task</div>
             
             </button>
+
             {taskComponentsList}
        
           <Modal isOpen={isModalOpen} ariaHideApp={false}>
